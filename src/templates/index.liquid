@@ -1,0 +1,102 @@
+{% comment %}
+  Re-use the .rte class wherever you output content that was added by a merchant using
+  the Rich Text Editor ( 'rte' stands for rich text editor ).
+  Style all HTML elements in that content the same way across the board.
+  Use the .rte class in your CSS to help maintain consistency.
+  Example: the h2 element should have the same size and color in:
+  - product descriptions
+  - collection descriptions
+  - page content
+  - blog post
+{% endcomment %}
+
+<div class="thirds cf">THIS IS THE DIV
+{% for collection in collections %}
+  {% if collection.handle == 'before' %}
+ 
+  <div class="third cf">
+    <div class="collection-third-image" style="background-image:url('{{ 'before.gif' | asset_url }}');"></div>
+    <a href="{{ collection.url }}">
+      <div class="collection-inner">
+        <span class="collection-title">{{ collection.title }}</span>
+        <p>{{ collection.description }}</p>
+      </div>
+    </a>
+   </div>
+
+
+  {% endif %}
+  {% endfor %}
+</div>
+
+{% comment %}
+<div class="thirds cf">
+  
+  {% for collection in collections %}
+  {% if collection.handle == 'before' %}
+ 
+  <div class="third">
+    <div class="collection-third-image" style="background-image:url('{{ 'before.gif' | asset_url }}');"></div>
+    <a class="collection-link" href="{{ collection.url }}">
+      <div class="collection-inner">
+        <span class="collection-title">{{ collection.title }}</span>
+        <p>{{ collection.description }}</p>
+      </div>
+    </a>
+   </div>
+
+
+  {% endif %}
+  {% endfor %}
+
+  {% for collection in collections %}
+  {% if collection.handle == 'during' %}
+
+  <div class="third">
+    <div class="collection-third-image" style="background-image:url('{{ 'during.gif' | asset_url }}');"></div>
+    <a class="collection-link" href="{{ collection.url }}">
+      <div class="collection-inner">
+        <span class="collection-title">{{ collection.title }}</span>
+        <p>{{ collection.description }}</p>
+      </div>
+    </a>
+  </div>
+
+  {% endif %}
+  {% endfor %}
+
+  {% for collection in collections %}
+  {% if collection.handle == 'after' %}
+
+  <div class="third">
+    <div class="collection-third-image" style="background-image:url('{{ 'after.gif' | asset_url }}');"></div>
+    <a class="collection-link" href="{{ collection.url }}">
+      <div class="collection-inner">
+        <span class="collection-title">{{ collection.title }}</span>
+        <p>{{ collection.description }}</p>
+      </div>
+    </a>
+  </div>
+
+  {% endif %}
+  {% endfor %}
+
+</div>
+
+<script>
+
+$(document).ready(function(){
+  $('.collection-link').click(function(e){
+    var href = $(this).attr('href');
+    e.preventDefault();
+    $(this).parent().addClass('clicked').siblings().addClass('away');
+    setTimeout(function(){
+      window.location = href;
+    }, 3000)
+  })
+})
+{% endcomment %}
+
+
+
+

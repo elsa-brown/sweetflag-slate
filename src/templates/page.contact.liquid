@@ -1,0 +1,70 @@
+{% comment %}
+Re-use the 'rte' class wherever you output content that was added by a merchant using
+the Rich Text Editor ( 'rte' stands for rich text editor ).
+Style all HTML elements in that content the same way across the board.
+Use the 'rte' class in your CSS to help maintain that consistency.
+Example: the h2 element should have the same size and color in:
+- product descriptions
+- collection descriptions
+- 'page' pages' content
+- blog post
+{% endcomment %}
+
+<!--<h1 class="page-title">Contact Us </h1>-->
+<!--<div class="rte">
+  {{ page.content }}
+</div>-->
+<div class="contact-form cf">
+<form accept-charset="UTF-8" action="https://formkeep.com/f/332f489c6a92" method="POST">
+  <input type="hidden" name="utf8" value="✓">
+  <input type="email" name="email" placeholder="Your Email">
+  <span class="message-label">message</span>
+  <textarea rows="4" cols="50" name="message"></textarea>
+  <button type="submit">Submit</button>
+</form>
+
+<div class="contact-extras-container">
+<div class="email">
+<span>info@sweetflag.club</span>
+</div>
+<div class="social"><span><a href="https://instagram.com/sweetflag_shop">{{ 'insta.png' | asset_url | img_tag: instagram }}</a></span><span><a href="https://www.facebook.com/Sweetflag-1513761608915139/?fref=ts">{{ 'fbook.png' | asset_url | img_tag: facebook }}</a></span></div>
+
+
+</div>
+</div>
+
+
+  <div class="contact-page-signup contact-form signup-container">
+    <p>{{ settings.popup_sign_up }}</p>
+    <div class="contact-form mailing-list cf">
+
+
+
+
+        <form action="//club.us11.list-manage.com/subscribe/post-json?u=e8caff0b9a11d0445dc743c38&amp;id=f4a1ac554e&c=u" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+          
+          <div class="input-wrapper email-wrapper">
+            <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="your@sweet.vibe">  
+          </div>
+
+          <div class="input-wrapper button-wrapper">
+            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">  
+          </div>
+
+          <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_e8caff0b9a11d0445dc743c38_f4a1ac554e" tabindex="-1" value=""></div>
+
+          <div id="mce-responses" class="clear">
+            <div class="response" id="mce-error-response" style="display:none"></div>
+            <div class="response" id="mce-success-response" style="display:none"></div>
+          </div>  
+
+          <div class="message"></div>
+
+        </form>
+        <script type='text/javascript' src='//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js'></script><script type='text/javascript'>(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='MMERGE1';ftypes[1]='text';fnames[2]='MMERGE2';ftypes[2]='text';fnames[3]='MMERGE3';ftypes[3]='text';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+        <!--End mc_embed_signup-->
+
+
+    </div>
+    <div class="thank-you"><p>{{ settings.popup_sign_up_ty }}</p></div>
+  </div> 

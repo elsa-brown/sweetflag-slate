@@ -1,0 +1,427 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9 ]><html class="ie9 no-js"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="UTF-8"/>
+  <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1' /><![endif]-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1">
+
+  <!-- Title and description ================================================== -->
+  <title>
+  {{ page_title }}{% if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif %}{% if current_page != 1 %} &ndash; Page {{ current_page }}{% endif %}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}
+  </title>
+
+  {% if page_description %}
+  <meta name="description" content="{{ page_description | escape }}" />
+  {% endif %}
+
+  <link rel="canonical" href="{{ canonical_url }}" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+  <link rel="icon" href="{{ 'favicon.ico' | asset_url }}" type="image/x-icon" />
+
+  {% include 'open-graph-tags' %}
+  {% include 'twitter-card' %}
+
+  {{ content_for_header }}
+
+  <!-- CSS ================================================== -->
+  {{ 'style.scss.css' | asset_url | stylesheet_tag }}
+  {{ 'style.css' | asset_url | stylesheet_tag }}
+  {{ 'swiper.min.css' | asset_url | stylesheet_tag }}
+  {{ 'magnify.css' | asset_url | stylesheet_tag }}
+  {{ 'social/social-icons.css' | global_asset_url | stylesheet_tag }}
+  {{ '//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,400italic,600italic,700italic' | stylesheet_tag }}
+
+  {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+  {% if template contains 'customers' %}
+  {{ 'customer_area.js'  | shopify_asset_url | script_tag }}
+  {% endif %}
+
+  <!-- Additional Shopify helpers that will likely be added to the global shopify_common.js some day soon. -->
+  {{ 'shopify_common.js'  | asset_url | script_tag }}
+  {{ 'js.cookie.js' | asset_url | script_tag }}
+  <!-- {{ 'mc_signup.js' | asset_url | script_tag }} Mailing List sign-up pop-up disabled, EB -->
+
+  {{ 'option_selection.js' | shopify_asset_url | script_tag }}
+
+  {{ '//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js' | script_tag }}
+  <script>jQuery('html').removeClass('no-js').addClass('js');</script>
+
+  <style>
+   .random-image-1 {
+     background-image:url('{{ 'random-1.jpg' | asset_url }}');
+     }
+
+    .random-image-2 {
+      background-image:url('{{ 'random-2.jpg' | asset_url }}');
+    }
+
+    @font-face {
+      font-family: 'u8';
+      src: url('{{ 'U8thin.eot'  | asset_url }}'); /* IE9 Compat Modes */
+      src: url('{{ 'U8thin.eot'  | asset_url }}?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+           url('{{ 'U8thin.woff'  | asset_url }}') format('woff'), /* Modern Browsers */
+           url('{{ 'U8thin.ttf'  | asset_url }}')  format('truetype'), /* Safari, Android, iOS */
+           url('{{ 'U8thin.svg'  | asset_url }}#e9ed6071382e49f6725b6d8deaafa36d') format('svg'); /* Legacy iOS */
+
+    }
+
+    @font-face {
+      font-family: 'avenir';
+      src: url('{{ 'AvenirLight.eot'  | asset_url }}'); /* IE9 Compat Modes */
+      src: url('{{ 'AvenirLight.eot'  | asset_url }}?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+           url('{{ 'AvenirLight.woff'  | asset_url }}') format('woff'), /* Modern Browsers */
+           url('{{ 'AvenirLight.ttf'  | asset_url }}')  format('truetype'), /* Safari, Android, iOS */
+           url('{{ 'AvenirLight.svg'  | asset_url }}#e9ed6071382e49f6725b6d8deaafa36d') format('svg'); /* Legacy iOS */
+
+    }
+
+
+    }
+
+
+  </style>
+
+<!-- fix light fonts for safari -->
+  <style>
+html {  -webkit-font-smoothing: subpixel-antialiased; }
+
+</style>
+
+  <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/ScrollMagic.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/plugins/debug.addIndicators.min.js"></script>
+  {{ '//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js' | script_tag }}
+{{ '//cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.0/animate.min.css' | stylesheet_tag }}
+{{ 'typeahead.jquery.min.js'  | asset_url | script_tag }}
+</head>
+
+<body id="{{ page_title | handle }}" class="{% if customer %}customer-logged-in {% endif %}template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}" >
+
+{% include 'age-check' %}
+
+  <div class="mobilenav">
+  <ul>
+    {% for link in linklists.main-menu.links %}
+    {% assign has_sub_menu = false %}
+    {% assign has_sub_categories = false %}
+    {% assign parent_link_active = false %}
+    {% assign child_list_handle = link.title | handle %}
+    {% if linklists[child_list_handle] and linklists[child_list_handle].links.size > 0 %}
+      {% assign has_sub_menu = true %}
+      {% for l in linklists[child_list_handle].links %}
+        {% if handle != blank and handle == l.object.handle %}
+          {% assign parent_link_active = true %}
+        {% elsif page_title == l.title %}
+          {% assign parent_link_active = true %}
+        {% endif %}
+      {% endfor %}
+    {% elsif link.type == 'collection_link' and link.object.all_tags.size > 0 %}
+      {% assign has_sub_categories = true %}
+    {% endif %}
+    {% unless link.title == 'Sale' %}
+    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+    {% endunless %}
+    {% endfor %}
+    {% for link in linklists['shop'].links %}
+    	<li class="{% if link.active or parent_link_active %} active{% endif %}">
+    		<a href="{{ link.url }}">{{ link.title }}</a>
+        </li>
+   	{% endfor %}
+    <li><a href="/collections/on-sale">sale</a></li>
+	 <br />
+    <li><a href="/cart"><span id="#counter" class="cart-count">{{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }} ({{ cart.total_price | money }})</span></a></li>
+    </ul>
+  </div>
+
+      <a href="javascript:void(0)" class="icon">
+        <div class="hamburger">
+          <div class="menui top-menu"></div>
+          <div class="menui mid-menu"></div>
+          <div class="menui bottom-menu"></div>
+      </div>
+      </a>
+
+  <div id="bg"> </div>
+  <div id="bg1"> </div>
+  <div id="bg2"> </div>
+
+<div class="signup-overlay">
+  <div class="signup-overlay-inner signup-container">
+    <img src="{{ 'ex.png' | asset_url }}" alt="" class="close-overlay ex">
+    <p>{{ settings.popup_sign_up }}</p>
+    <div class="contact-form mailing-list cf">
+      <form class="popup_submit" accept-charset="UTF-8" method="POST">
+        <input class="email-input" type="email" name="email" placeholder="your@sweet.vibe">
+        <button class="email-submit-button" type="submit">&rarr;</button>
+        <div class="message"></div>
+      </form>
+      {% comment %}<p class="no-thanks"><span class="close-overlay">no thanks</span></p>{% endcomment %}
+    </div>
+    <div class="thank-you"><p>{{ settings.popup_sign_up_ty }}</p></div>
+  </div> 
+</div>
+
+<div class="container">
+
+      <div class="header max-width">
+
+        <span class="logo">
+          <a href="/">  {{ 'logotype.png' | asset_url | img_tag: shop.name }} </a>
+        </span>
+
+        <div class="cart-link">
+          <a href="/cart"> <span id="counter" class="cart-count"> {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }} ({{ cart.total_price | money }}) </span></a>
+        </div>
+
+        <div class="menu">
+          {% include 'site-nav' %}
+        </div>
+
+      </div>
+
+        {% if shop.customer_accounts_enabled %}
+
+       <div class="customer-links">
+          {% if customer %}
+              Logged in as <a href="/account">{{ customer.first_name }}</a> · {{ 'Log out' | customer_logout_link }}
+          {% else %}
+            {{ 'Log in' | customer_login_link }}
+
+          {% if shop.customer_accounts_optional %}
+            or {{ 'Create an account' | customer_register_link }}
+          {% endif %}
+          {% endif %}
+        </div>
+
+        {% endif %}
+
+
+      {% comment %}
+        It would be nice if the logo was a shop setting, rather than a theme setting.
+        But for now, it is a theme setting. The shop logo is uploaded on the theme settings page.
+        Link to the theme settings page of currently published theme will always be:
+        http://www.shopify.com/admin/themes/current/settings.
+        To add theme settings to a theme, see this: http://docs.shopify.com/themes/theme-templates/settings
+        Theme settings are added to http://www.shopify.com/admin/themes/current#config/settings.html
+      {% endcomment %}
+
+        {% if settings.use_logo %}
+        <a id="logo" href="/">
+          {{ 'logo.png' | asset_url | img_tag: shop.name }}
+        </a>
+        {% else %}
+
+        {% endif %}
+        {% if template == 'index' %}
+        {% comment %}
+          Many SEO audit tools look for a h1 tag on the home page. Let's give 'em one.
+          Other pages should use the resource name as h1 tag. For example, on the product
+          page, the product title will use a h1 tag.
+        {% endcomment %}
+        <h1 class="hidden">{{ shop.name }}</h1>
+        {% endif %}
+
+
+    </header>
+
+    {% comment %}
+      show the slider if we're on a collection page
+    {% endcomment %}
+    {% if {{template}} == 'collection' %}
+    <div class="slider">
+      <div class="frontpage frontpage-slider swiper-container" data-slides-per="1" data-autoplay-speed="7000">
+       <div class="swiper-wrapper">
+           <div class="swiper-slide" style="background-image:url('{{ 'slide1.jpg' | asset_url }}');height:400px; background-size:cover;background-position: center center;">
+            {% if {{settings.product_slide_1 != "" }}%}
+              <a class="overlay" href="{{ settings.product_slide_1 }}">
+                <span class="promo-text">{{ settings.product_slide_1_text }}</span>
+              </a>
+            {% else %}
+              <div class="overlay">
+                <span class="promo-text">{{ settings.product_slide_1_text }}</span>
+              </div>
+            {% endif%}
+            </a>
+          </div>
+           <div class="swiper-slide" style="background-image:url('{{ 'slide2.jpg' | asset_url }}');height:400px; background-size:cover;background-position: center center;">
+            {% if {{settings.product_slide_2 != "" }}%}
+              <a class="overlay" href="{{ settings.product_slide_2 }}">
+                <span class="promo-text">{{ settings.product_slide_2_text }}</span>
+              </a>
+            {% else %}
+              <div class="overlay">
+                <span class="promo-text">{{ settings.product_slide_2_text }}</span>              
+              </div>
+            {% endif%}
+            </a>
+          </div>
+           <div class="swiper-slide" style="background-image:url('{{ 'slide3.jpg' | asset_url }}');height:400px; background-size:cover;background-position: center center;">
+            {% if {{settings.product_slide_3 != "" }}%}
+              <a class="overlay" href="{{ settings.product_slide_3 }}">
+                <span class="promo-text">{{ settings.product_slide_3_text }}</span>
+              </a>
+            {% else %}
+              <div class="overlay">
+                <span class="promo-text">{{ settings.product_slide_3_text }}</span>                
+              </div>
+            {% endif%}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-fp-background"></div>
+    </div>
+  
+    {% endif %}
+
+    <div id="main" class="max-width" role="main" test="{{ template }}">
+      {{ content_for_layout }}
+    </div>
+
+
+    <div class="footer max-width">
+      <div class="footer-links">
+        <ul>
+          <li><a href="/pages/about-us">about</a></li>
+          <li><a href="/pages/contact">contact</a></li>
+        </ul>
+      </div>
+      <div class="logotype">
+        <a href="/">{{ 'logotype.png' | asset_url | img_tag: shop.name }}</a>
+      </div>
+     </div>
+
+  </div>
+
+  </div>
+
+  <footer>
+  <div>THIS IS THE FOOTER</div>
+  <!--footer bar -->
+  </footer>
+
+    {% comment %}Shopify does not support Internet Explorer 6 nor 7. It does encourage themes to support IE8 until the end of 2014.{% endcomment %}
+    <!--[if lt IE 8]>
+    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+
+  </div>
+
+  <!-- end of #container -->
+
+  {{ 'shop.js'  | asset_url | script_tag }}
+  {{ 'swiper.min.js'  | asset_url | script_tag }}
+  {{ 'swiper.jquery.min.js'  | asset_url | script_tag }}
+  {% if template != 'index' %}{{ 'swiper-main.js'  | asset_url | script_tag }}{% endif %}
+  {% if template == 'index' %}{{ 'swiper-main-frontpage.js'  | asset_url | script_tag }}{% endif %}
+  {{ 'plus-minus.js'  | asset_url | script_tag }}
+  {{ 'switcher.js'  | asset_url | script_tag }}
+  {{ 'notify.min.js'  | asset_url | script_tag }}
+  {{ 'trim.js'  | asset_url | script_tag }}
+  {{ 'fastclick.js'  | asset_url | script_tag }}
+  {{ 'typed.min.js'  | asset_url | script_tag }}
+  {{ 'hamburgler.js'  | asset_url | script_tag }}
+  {{ 'okzoom.min.js'  | asset_url | script_tag }}
+  {{ 'cart.min.js'  | asset_url | script_tag }}
+  {{ 'rivets.bundled.min.js'  | asset_url | script_tag }}
+
+{% if template == 'collection' %}
+<div id="magic">
+        <div class="move">
+          <div class="image-flyers">
+            <span id="high1"><!--<img src="{{ 'high1.gif' | asset_url }}">--></span>
+              <span class="spacer-big"></span>
+            <span id="high2"><img src="{{ 'high2.gif' | asset_url }}"></span>
+              <span class="spacer-big"></span>
+            <span id="high3"><img src="{{ 'high3.gif' | asset_url }}"></span>
+
+          </div>
+        </div>
+  <span class="spacer-big"></span>
+        <div class="spacer s1" id="sec2">
+              <span class="spacer-big"></span>
+        </div>
+  <span class="spacer-big"></span>
+        <div class="spacer s1" id="sec3">
+                <span class="spacer-big"></span>
+        </div>
+
+
+</div>
+
+
+
+  <script>
+    // init controller
+    var controller = new ScrollMagic.Controller({globalSceneOptions: {
+
+      duration: 2500
+
+    }});
+
+    // build scenes
+    new ScrollMagic.Scene({triggerElement: "#sec2"})
+            .setClassToggle("#high2", "fly-2") // add class toggle
+            .addTo(controller);
+    new ScrollMagic.Scene({triggerElement: "#sec3"})
+            .setClassToggle("#high3", "fly-3") // add class toggle
+            .addTo(controller);
+  </script>
+
+{% endif %}
+
+<script>
+
+$(document).ready(function() {
+
+  $.notify.addStyle('happyblue', {
+    html: '<div class="notify-text-container"><span data-notify-text/>{{ 'party.png' | asset_url | img_tag: party }}</div>',
+    classes: {
+      base: {
+        "white-space": "nowrap",
+        "background-color": "#EFD3FF",
+        "padding": "5px"
+      },
+      superblue: {
+        "color": "white",
+        "background-color": "#EFD3FF"
+      }
+    },
+  });
+
+  $.notify.defaults( {
+    globalPosition: 'top left',
+    // hide animation
+    hideAnimation: 'slideUp',
+// hide animation duration
+    hideDuration: 300,
+    autoHideDelay: 10000,
+  });
+
+$(function(){
+
+   if (window.location.hash){
+      var hash = window.location.hash.substring(1);
+      if (hash == "success"){
+        $.notify('thanks, talk soon!', {style: 'happyblue'});
+      }
+   }
+
+});
+
+});
+
+</script>
+
+  {% include 'ajaxify-cart' %}
+
+</body>
+
+<div class="responseClass"></div>
+
+</html>

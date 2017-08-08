@@ -1,0 +1,182 @@
+<!-- Solution brought to you by Caroline Schnapp -->
+<!-- See this: https://docs.shopify.com/support/your-store/products/can-i-recommend-related-products#finding-a-relevant-collecitons -->
+
+{% comment %}
+  Number of related items per row,
+  and number of rows.
+{% endcomment %}
+
+{% assign number_of_related_products_per_row = 4 %}
+{% assign number_of_rows = 1 %}
+
+{% comment %}
+  Heading.
+  Leave blank if you don't need one.
+{% endcomment %}
+
+{% assign heading = 'related vibes' %}
+
+{% comment %}
+  Set either or both to true, if you want
+  to limit yourself to items with same vendor, and/or type.
+{% endcomment %}
+
+{% assign same_vendor = false %}
+{% assign same_type = false %}
+
+{% comment %}
+  Collections to ignore.
+  Never pick related items from those.
+{% endcomment %}
+
+{% assign exclusions = 'frontpage' | split: ',' %}
+
+{% comment %}
+  Looking for a relevant collection.
+{% endcomment %}
+
+
+{% comment %}{% if product.metafields.c_f['Related Products'] %}
+  {% assign collection = collections[product.metafields.c_f['Related Products']] %}
+{% endif %}{% endcomment %}
+
+{% if product.type == "" %}
+
+  {% assign collection_title = 'browse' %}
+
+{% else %}
+  {% assign collection_title = product.type %}
+
+{% endif %}
+
+  {% assign collection = collections[collection_title] %}
+
+{% assign found_a_collection = true %}
+
+<div style="display: none">
+  {{ collection_title // collection.title }}
+</div>
+
+{% comment %}{% if collection and collection.all_products_count > 1 %}
+  {% unless exclusions contains collection.handle %}
+    {% assign found_a_collection = true %}
+  {% endunless %}
+{% endif %}
+{% unless found_a_collection %}
+  {% for c in product.collections %}
+    {% unless exclusions contains c.handle or c.all_products_count < 2 %}
+      {% assign found_a_collection = true %}
+      {% assign collection = c %}
+      {% break %}
+    {% endunless %}
+  {% endfor %}
+{% endunless %}{% endcomment %}
+
+
+
+
+{% comment %}
+  If we have a relevant collection.
+{% endcomment %}
+
+{% if found_a_collection %}
+
+  {% assign counter = 0 %}
+  {% assign break_at = number_of_rows | times: number_of_related_products_per_row %}
+  {% assign current_product = product %}
+
+  {% case number_of_related_products_per_row %}
+    {% when 1 %}
+      {% assign grid_item_width = '' %}
+    {% when 2 %}
+      {% assign grid_item_width = 'large--one-half medium--one-half' %}
+    {% when 3 %}
+      {% assign grid_item_width = 'large--one-third medium--one-half' %}
+    {% when 4 %}
+      {% assign grid_item_width = 'large--one-quarter medium--one-third small--one-half' %}
+    {% when 5 %}
+      {% assign grid_item_width = 'large--one-fifth medium--one-third small--one-half' %}
+    {% when 6 %}
+      {% assign grid_item_width = 'large--one-sixth medium--one-third small--one-half' %}
+    {% else %}
+      {% assign grid_item_width = 'large--one-quarter medium--one-third small--one-half' %}
+  {% endcase %}
+
+  {% assign lazy_load_related = true %}
+
+  {% if product.type == "" %}
+
+    {% capture related_items %}
+      {% assign primary_type = product.type %}
+      {% for product in collection.products %}    
+        {% unless product.handle == current_product.handle %}
+         {% include 'product-grid-item' %}          
+        {% endunless %}
+      {% endfor %}
+    {% endcapture %}
+
+  {% else %}
+
+    {% capture related_items %}
+      {% assign primary_type = product.type %}
+      {% for product in collection.products %}    
+        {% unless product.handle == current_product.handle %}
+          {% if product.type == primary_type %}
+            {% include 'product-grid-item' %}          
+          {% endif %}  
+        {% endunless %}
+      {% endfor %}
+    {% endcapture %}
+
+  {% endif %}
+
+{% comment %}  {% capture related_items %}
+    {% for product in collection.products %}    
+      {% unless product.handle == current_product.handle %}
+         {% unless same_vendor and current_product.vendor != product.vendor %}
+           {% unless same_type and current_product.type != product.type %}
+             {% include 'product-grid-item' %}
+          {% endunless %}
+        {% endunless %}
+      {% endunless %}
+    {% endfor %}
+  {% endcapture %}{% endcomment %}
+
+  {% assign related_items = related_items | trim %}
+
+  {% unless related_items == blank %}
+
+
+      {% unless heading == blank %}
+
+
+      {% endunless %}
+
+        {{ related_items }}
+
+
+  {% endunless %}
+
+{% endif %}
+
+
+{{ 'jquery.pick.js' | asset_url | script_tag }}
+<script type="text/javascript" charset="utf-8">
+//<![CDATA[
+var howMany = {{ number_of_related_products_per_row }};
+jQuery(function() {
+  jQuery('.related-container > li').pick(howMany);
+  $('.related-container li').each(function(){
+    var anchor = $(this).find('a')[0];
+    var href = $(anchor).attr('href');
+    var new_href = href.replace(/\/collections\/(.*)\/products\//, '/collections/browse/products/')
+    $(anchor).attr('href', new_href);
+
+    var image = $(this).find('img')[0];
+    var src = $(image).attr('lazy-src');
+    $(image).attr('src', src).attr('lazy-src', '').removeClass('lazy');
+  })
+  $(".related-container").show();
+});
+//]]>
+</script>

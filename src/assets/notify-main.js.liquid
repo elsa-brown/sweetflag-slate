@@ -1,0 +1,33 @@
+$(document).ready(function() {
+
+  $.notify.addStyle('happyblue', {
+    html: '<div><span data-notify-text/>:tada:</div>',
+    classes: {
+      base: {
+        "white-space": "nowrap",
+        "background-color": "lightblue",
+        "padding": "5px"
+      },
+      superblue: {
+        "color": "white",
+        "background-color": "blue"
+      }
+    },
+  });
+
+  $.notify.defaults( {
+    globalPosition: 'top center'
+  });
+
+$(function(){
+
+   if (window.location.hash){
+      var hash = window.location.hash.substring(1);
+      if (hash == "success"){
+        $.notify('thanks, talk soon!', {style: 'happyblue'});
+      }
+   }
+
+});
+
+});

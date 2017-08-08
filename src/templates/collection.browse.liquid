@@ -1,0 +1,254 @@
+{% comment %}
+  Important notes about pagination:
+  - Never access collection.products before the opening paginate tag.
+  - Never paginate by more than 50.
+{% endcomment %}
+
+{% assign products_per_page = settings.products_per_row | times: settings.number_of_rows %}
+{% assign numbers = 'zero, one, two, three, four, five, six' | split: ',' %}
+{% assign products_per_row = settings.products_per_row | times: 1 %}
+{% assign products_per_row = numbers[products_per_row] | strip | append: '-per-row' %}
+
+{% paginate collection.products by products_per_page %}
+
+{% comment %}
+  Re-use the .rte class wherever you output content that was added by a merchant using
+  the Rich Text Editor ( 'rte' stands for rich text editor ).
+  Style all HTML elements in that content the same way across the board.
+  Use the .rte class in your CSS to help maintain consistency.
+  Example: the h2 element should have the same size and color in:
+  - product descriptions
+  - collection descriptions
+  - page content
+  - blog post
+{% endcomment %}
+
+
+<!--<h1 class="left">{{ collection.title }}</h1>-->
+
+<div id="container-typed-tags">
+  <div id="the-basics">
+    <input class="typeahead" type="text" type="submit" placeholder="enter vibe">
+  </div>
+<div id="hidden-picker">
+<ul class="clearfix filters">
+  <li class="clearfix filter">
+    <select class="coll-filter" name="options">
+      <option value="">All</option>
+  {% for tag in collection.all_tags %}
+  {% if current_tags contains tag %}
+  <option value="{{ tag }}" selected>{{ tag }}</option>
+  {% elsif collection.all_tags contains tag %}
+  <option value="{{ tag | handle }}">{{ tag }}</option>
+  {% endif %}
+  {% endfor %}
+    </select>
+    <div class="escape-x"><span>x</span></div>
+  </li>
+</ul>
+
+</div>
+<span class="trysome">what's your vibe...? </span><div class="suggestions"></div>
+</div>
+
+
+
+<div class="data-sort">
+  <select id="sort-by">
+    <option value="featured">Featured Items</option>
+    <option value="price-ascending">Price: Low to High</option>
+    <option value="price-descending">Price: High to Low</option>
+    <option value="created-ascending">Oldest to Newest</option>
+    <option value="created-descending">Newest to Oldest</option>
+    <option value="best-selling">Best Selling</option>
+    <option value="title-ascending">A-Z</option>
+    <option value="title-descending">Z-A</option>
+  </select>
+</div>
+
+
+
+
+
+<ul class="grid clearfix">
+{% for product in collection.products %}
+  {% include 'product-grid-item' with products_per_row %}
+{% else %}
+  <p>There are no products in this view.</p>
+{% endfor %}
+</ul>
+{% if paginate.pages > 1 %}
+<div class="pagination centered">
+  {{ paginate | default_pagination }}
+</div>
+{% endif %}
+
+{% endpaginate %}
+
+<script>
+Shopify.queryParams = {};
+if (location.search.length) {
+  for (var aKeyValue, i = 0, aCouples = location.search.substr(1).split('&'); i < aCouples.length; i++) {
+    aKeyValue = aCouples[i].split('=');
+    if (aKeyValue.length > 1) {
+      Shopify.queryParams[decodeURIComponent(aKeyValue[0])] = decodeURIComponent(aKeyValue[1]);
+    }
+  }
+}
+jQuery('#sort-by')
+  .val('{{ collection.sort_by | default: collection.default_sort_by | escape }}')
+  .bind('change', function() {
+    Shopify.queryParams.sort_by = jQuery(this).val();
+    location.search = jQuery.param(Shopify.queryParams).replace(/\+/g, '%20');
+  });
+</script>
+
+<script>
+  /* Product Tag Filters - Good for any number of filters on any type of collection page.
+     Give you product tag filter select element a class of coll-filter.
+     Give your collection select a class of coll-picker.
+     Brought to you by Caroline Schnapp. */
+  Shopify.queryParams = {};
+  if (location.search.length) {
+    for (var aKeyValue, i = 0, aCouples = location.search.substr(1).split('&'); i < aCouples.length; i++) {
+      aKeyValue = aCouples[i].split('=');
+      if (aKeyValue.length > 1) {
+        Shopify.queryParams[decodeURIComponent(aKeyValue[0])] = decodeURIComponent(aKeyValue[1]);
+      }
+    }
+  }
+  jQuery('.coll-picker').change(function() {
+    if (jQuery(this).val()) {
+      location.href = '/collections/' + jQuery(this).val();
+    }
+    else {
+      location.href = '/collections/browse';
+    }
+  });
+  var collFilters = jQuery('.coll-filter');
+  collFilters.change(function() {
+    delete Shopify.queryParams.page;
+    var newTags = [];
+    collFilters.each(function() {
+      if (jQuery(this).val()) {
+        newTags.push(jQuery(this).val());
+      }
+    });
+    {% if collection.handle %}
+    var newURL = '/collections/{{ collection.handle }}';
+    if (newTags.length) {
+      newURL += '/' + newTags.join('+');
+    }
+    var search = jQuery.param(Shopify.queryParams);
+    if (search.length) {
+      newURL += '?' + search;
+    }
+    location.href = newURL;
+    {% else %}
+    if (newTags.length) {
+      Shopify.queryParams.constraint = newTags.join('+');
+    }
+    else {
+      delete Shopify.queryParams.constraint;
+    }
+    location.search = jQuery.param(Shopify.queryParams);
+    {% endif %}
+  });
+</script>
+
+
+
+<!--- TYPEHEAD.JS ---->
+
+<script>
+var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substringRegex;
+
+    // an array that will be populated with substring matches
+    matches = [];
+
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        matches.push(str);
+      }
+    });
+
+    cb(matches);
+  };
+};
+
+var states = [{% for tag in collection.all_tags %}'{{ tag }}',{% endfor %}
+];
+
+$('#the-basics .typeahead').typeahead({
+  hint: true,
+  highlight: false,
+  autoSelect: true,
+  minLength: 1
+},
+{
+  name: 'states',
+  source: substringMatcher(states)
+});
+
+
+</script>
+
+
+<!--- END TYPEHEAD.JS ---->
+
+
+<!-- My custom input changer -->
+<script>
+$('.typeahead').bind('typeahead:select', function(ev, suggestion) {
+$(".coll-filter option").prop('selected', false).filter(function() {
+    return $(this).text() == suggestion;
+}).prop('selected', true).change();;
+});
+</script>
+
+<!-- x function -->
+<script>
+$(".escape-x").click(function () {
+$(".coll-filter option").prop('selected', false).filter(function() {
+    return $(this).text() == 'All';
+}).prop('selected', true).change();;
+});
+</script>
+
+<script>
+  $(function(){
+      $(".suggestions").typed({
+        strings: ["{{ settings.promoted_vibes_1 }}", "{{ settings.promoted_vibes_2 }}", "{{ settings.promoted_vibes_3 }}", "{{ settings.promoted_vibes_4 }}"],
+        typeSpeed: 100,
+         backSpeed: 100,
+         showCursor: false,
+         loop: true
+      });
+  });
+</script>
+
+
+
+
+
+
+<script>
+$('.typeahead').keypress(function (e) {
+ var key = e.which;
+ if(key == 13)  // the enter key code
+  {
+    $('.tt-dataset div:first-child').click();
+    return false;
+  }
+});
+$('.typeahead').bind('typeahead:autocomplete', function(ev, autocomplete) {
+  console.log('autocomplete: ' + autocomplete);
+});
+</script>

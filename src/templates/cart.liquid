@@ -1,0 +1,169 @@
+<h1>Shopping Cart</h1>
+
+{% if cart.item_count > 0 %}
+
+<form action="/cart" method="post">
+
+  <table>
+
+    <thead>
+      <tr>
+        <th class="hide-on-small">Item</th>
+        <th>&nbsp;</th>
+        <th class="hide-on-small">Price</th>
+        <th>Quantity</th>
+        <th>Total</th>
+        <th class="hide-on-small">&nbsp;</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+    {% for item in cart.items %}
+
+      {% comment %}
+      Determining the handle of the collection that was last seen for the 'continue shopping' link.
+      {% endcomment %}
+
+      {% assign collection_url = item.product.collections.last.url %}
+      {% if collection_url == '/collections/frontpage' or collection_url == blank %}
+        {% assign collection_url = '/collections/all' %}
+      {% endif %}
+
+      {% if forloop.first %}
+        {% assign continue_shopping_url = collection_url %}
+      {% endif %}
+
+      <tr>
+        <td class="hide-on-small cart-image">
+          <a href="{{ collection_url }}{{ item.url }}">
+            <img src="{{ item | img_url: 'compact' }}"  alt="{{ item.title | escape }}" />
+          </a>
+        </td>
+        <td>
+          <h2 class="delta">
+            <a class="cart-link-title" href="{{ collection_url }}{{ item.url }}">
+            {{ item.title }}
+            </a>
+          </h2>
+          {% comment %}
+          Line Item Properties
+          {% endcomment %}
+          {% assign properties_amount = item.properties | size %}
+          {% if properties_amount > 0 %}
+          <p>
+            {% for p in item.properties %}
+              {% unless p.last == blank %}
+                {{ p.first }}:
+                {% if p.last contains '/uploads/' %}
+                  <a href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                {% else %}
+                  {{ p.last }}
+                {% endif %}
+                <br />
+              {% endunless %}
+            {% endfor %}
+          </p>
+          {% endif %}
+          <h3 class="epsilon vendor-cart">{{ item.vendor }}</h3>
+        </td>
+        <td class="hide-on-small cart-money">{{ item.price | money }}</td>
+        <td>
+          <input type="number" name="updates[]" id="updates_{{ item.id }}" class="quantity" value="{{ item.quantity }}" />
+        </td>
+        <td class="cart-total">{{ item.line_price | money }}</td>
+        <td class="hide-on-small">
+          <a class="remove-link-cart" href="/cart/change?line={{ forloop.index }}&quantity=0">Remove</a>
+        </td>
+      </tr>
+    {% endfor %}
+
+    </tbody>
+
+  </table>
+
+  {% comment %}
+  For the checkout and update buttons to work, they need to use
+  a name attribute set to 'checkout' and 'update', respectively. That's case-sensitive.
+  {% endcomment %}
+
+  	
+  
+  <div class="column two-thirds flow-opposite right-aligned cart-buttons cart-contain-checkout">
+    <h3 class="gamma subtotal-cart">Subtotal {{ cart.total_price | money }} </h3>
+    <a class="hide-on-small" href="{{ continue_shopping_url }}">Continue shopping</a>
+    <span class="or first-or hide-on-small"></span>
+    <input class="update-button" type="submit" name="update" value="Update cart" />
+    <span class="or">or</span>
+    <input type="submit" name="checkout" value="Check out" />
+{% for item in cart.items %}
+	{% if item.product.type == 'Pipe'%}
+		{% if forloop.first %}
+        <p class="checkout-box" style="float: none; text-align: right; clear: both; margin: 10px 0;">
+  <input style="float:none; vertical-align: middle; margin-top: -2px;" type="checkbox" id="agree" />
+  <label style="display:inline; float:none; text-transform:initial;" for="agree">
+    I am over 21 & have read the <a style="text-decoration: underline;" href="/pages/terms-and-conditions">terms and conditions</a>.
+    <div id="response"></div>
+  </label>   
+</p>
+		{% endif %}
+	{% endif %}
+{% endfor %}
+    
+    
+    {% for item in cart.items %}
+	{% if item.product.type == 'Paper'%}
+		{% if forloop.first %}
+        <p class="checkout-box" style="float: none; text-align: right; clear: both; margin: 10px 0;">
+  <input style="float:none; vertical-align: middle; margin-top: -2px;" type="checkbox" id="agree" />
+  <label style="display:inline; float:none; text-transform:initial;" for="agree">
+    I am over 21 & agree to the <a style="text-decoration: underline;" href="/pages/terms-and-conditions">terms and conditions</a>.
+    <div id="response"></div>
+  </label>   
+</p>
+		{% endif %}
+	{% endif %}
+{% endfor %}
+    
+   
+
+
+    {% comment %}Paypal and Google checkout buttons{% endcomment %}
+    {% if additional_checkout_buttons %}
+    <p class="additional-checkout-buttons">
+      {{ content_for_additional_checkout_buttons }}
+    </p>
+    {% endif %}
+  </div>
+
+  {% comment %}
+  For the special instructions to be submitted with order,
+  we need to use a name attribute set to 'note'.
+  {% endcomment %}
+  <div class="column third flow-opposite instructions-container left-aligned">
+    <p class="instructions">{{ settings.cart_note_text }}</p>
+    <textarea name="note">{{ cart.note }}</textarea>
+  </div>
+
+</form>
+
+{% else %}
+
+<div>
+  <span>your cart is empty... to find some products go: <a style="font-weight:bold;"href="/collections/all">here</a>.</span>
+  <br>
+  <span class="quote"></span><br><br>
+</div>
+
+<script>
+$(document).ready(function() {
+    var quotes = new Array("Emptiness is just another idea, another illusion." ,
+    "None of this exists. All important decisions in the universe occur someplace else." , "The emptiness bleeds the heart dry of its emotions and drains the tears of the soul." , "Every word is like an unnecessary stain on silence and nothingness." ,
+    "If you recognize the emptiness of your thoughts instead of solidifying them, the arising and subsiding of each thought will clarify and strengthen your realization of emptiness." , "You're a part of me. I'm a part of you and we are all a part of this great nothingness." ,
+    "You are fighting against nothingness all the time by creating a series of shields that you call personality, life history, feelings, ideas, and ways of seeing."),
+    randno = quotes[Math.floor( Math.random() * quotes.length )];
+    $('.quote').text( "''" + randno + "''" );
+});
+</script>
+
+{% endif %}
